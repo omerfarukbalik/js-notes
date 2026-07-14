@@ -8,23 +8,28 @@ These aren't transcriptions. Each note is written after finishing a section, fro
 
 ```
 js-notes/
-├── 02-fundamentals-part-1.md
-├── 03-fundamentals-part-2.md
-└── challenges/
-    ├── 02-fundamentals-part-1/
-    └── 03-fundamentals-part-2/
+├── 02-fundamentals-part-1/
+│   ├── notes.md
+│   └── challenge-*.js
+├── 03-fundamentals-part-2/
+│   ├── notes.md
+│   └── challenge-*.js
+├── 04-developer-skills/
+│   └── notes.md
+└── 07-dom-basics/
+    ├── notes.md
+    └── guess-my-number/     ← course project
 ```
 
-Notes live in the root, one `.md` per section. Coding challenge solutions live in `challenges/`, grouped by section.
+One folder per section. Notes, challenge solutions, and any course project live together.
 
 ## Progress
 
 - [x] Section 2 — JavaScript Fundamentals, Part 1
 - [x] Section 3 — JavaScript Fundamentals, Part 2
-- [ ] Section 4 — How to Write Better Code
-- [ ] Section 5 — Developer Skills & Editor Setup
-- [ ] Section 6 — HTML & CSS Crash Course
-- [ ] Section 7 — JavaScript in the Browser: DOM and Events
+- [x] Section 4 — Developer Skills & Editor Setup
+- [x] Section 5 — HTML & CSS Crash Course
+- [x] Section 7 — JavaScript in the Browser: DOM and Events
 - [ ] Section 8 — How JavaScript Works Behind the Scenes
 - [ ] Section 9 — Data Structures, Modern Operators and Strings
 - [ ] Section 10 — A Closer Look at Functions
@@ -41,7 +46,7 @@ Notes live in the root, one `.md` per section. Coding challenge solutions live i
 ## Note format
 
 ```markdown
-## Topic (L###)
+## Topic
 **In my words:** the concept, explained without jargon
 **Why it matters:** where this actually shows up
 **Gotcha:** the thing that will bite me later
