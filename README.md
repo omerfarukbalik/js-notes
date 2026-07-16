@@ -2,7 +2,7 @@
 
 Section-by-section notes from **The Complete JavaScript Course** (Jonas Schmedtmann). Concepts rewritten in my own words, with gotchas and code examples.
 
-These aren't transcriptions. Each note is written after finishing a section, from memory first, then checked. The rewriting is the point — if I can't explain it without the video open, I didn't learn it.
+These aren't transcriptions. Each note is written after finishing a section, from memory first, then checked. The rewriting is the point
 
 ## Structure
 
@@ -18,7 +18,7 @@ js-notes/
 │   └── notes.md
 └── 07-dom-basics/
     ├── notes.md
-    └── guess-my-number/     ← course project
+    └── guess-my-number/    
 ```
 
 One folder per section. Notes, challenge solutions, and any course project live together.
@@ -30,7 +30,7 @@ One folder per section. Notes, challenge solutions, and any course project live 
 - [x] Section 4 — Developer Skills & Editor Setup
 - [x] Section 5 — HTML & CSS Crash Course
 - [x] Section 7 — JavaScript in the Browser: DOM and Events
-- [ ] Section 8 — How JavaScript Works Behind the Scenes
+- [x] Section 8 — How JavaScript Works Behind the Scenes
 - [ ] Section 9 — Data Structures, Modern Operators and Strings
 - [ ] Section 10 — A Closer Look at Functions
 - [ ] Section 11 — Working With Arrays
