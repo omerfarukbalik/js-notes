@@ -1,6 +1,6 @@
 # Section 9 — Data Structures, Modern Operators and Strings
 
-Mostly ES6+ syntax. None of it does anything you couldn't do before — it just does it in far less code. This is the section that makes your JS start looking modern.
+Mostly ES6+ syntax. None of it does anything i couldn't do before — it just does it in far less code. This is the section that makes your JS start looking modern.
 
 ---
 
@@ -324,3 +324,291 @@ for (const [i, el] of menu.entries()) {
 ```
 
 **`i + 1`** because arrays are zero-indexed but menu items should read as 1, 2, 3.
+
+---
+
+## Optional Chaining `?.`
+
+**In my words:** Only continue reading the chain if what's before the `?.` actually exists. If it's `null` or `undefined`, stop and return `undefined` instead of throwing.
+
+```js
+// old way — nested existence checks
+if (restaurant.openingHours && restaurant.openingHours.mon) {
+  console.log(restaurant.openingHours.mon.open);
+}
+
+// optional chaining
+console.log(restaurant.openingHours.mon?.open);        // undefined if mon doesn't exist
+console.log(restaurant.openingHours?.mon?.open);       // safe even if openingHours is missing
+```
+
+**Gotcha:** `?.` checks for **nullish** (`null` / `undefined`), not falsy. A property with value `0` or `''` still continues the chain.
+
+### Combining with `??`
+
+The natural pairing — `?.` gives `undefined` when something's missing, `??` supplies the fallback:
+
+```js
+console.log(restaurant.openingHours.mon?.open ?? 'closed');
+```
+
+### On Methods
+
+```js
+console.log(restaurant.order?.(0, 1) ?? 'Method does not exist');
+```
+
+The `?.()` runs the method **only if it exists**. Without it, calling a missing method throws a TypeError.
+
+### On Arrays
+
+```js
+const users = [];
+console.log(users[0]?.name ?? 'Array is empty');
+```
+
+Cleaner than `users.length > 0 ? users[0].name : 'Array is empty'`.
+
+---
+
+## Looping Over Objects
+
+Objects aren't iterable, so `for...of` doesn't work directly. Convert to an array first.
+
+| Method | Returns |
+|---|---|
+| `Object.keys(obj)` | array of property **names** |
+| `Object.values(obj)` | array of property **values** |
+| `Object.entries(obj)` | array of `[key, value]` pairs |
+
+```js
+// keys
+for (const day of Object.keys(openingHours)) {
+  console.log(day);          // thu, fri, sat
+}
+
+// values
+const values = Object.values(openingHours);
+
+// entries — both at once, destructured in the loop head
+for (const [key, value] of Object.entries(openingHours)) {
+  console.log(`${key}: ${value.open}`);
+}
+```
+
+**`Object.entries` is the one you'll reach for most** — it's the object equivalent of `array.entries()`.
+
+---
+
+## Sets
+
+**In my words:** A collection of **unique** values. Duplicates are impossible — adding one that's already there does nothing.
+
+```js
+const orderSet = new Set(['x', 'x', 'y', 'z', 'z', 'y']);
+console.log(orderSet);        // Set(3) { 'x', 'y', 'z' }
+```
+
+- Sets are **iterable** (so `for...of` and spread work).
+- **Order is irrelevant** — there are no indexes.
+- Any iterable can be passed in, including a **string**:
+
+```js
+console.log(new Set('jonas'));   // Set(4) { 'j', 'o', 'n', 'a', 's' }
+```
+
+### Set Methods
+
+| Method | Does |
+|---|---|
+| `.size` | number of elements (a **property**, not `.length`) |
+| `.has('x')` | `true` / `false` — equivalent of `includes` |
+| `.add('t')` | adds an element |
+| `.delete('t')` | removes an element |
+| `.clear()` | removes everything |
+
+**Gotcha:** **There is no way to read a value out of a set by index.** `orderSet[0]` is `undefined`. If you need indexed access, you wanted an array. In a set, all you can meaningfully ask is *whether* something is in it.
+
+### The Main Use Case — Removing Duplicates
+
+```js
+const staff = ['Waiter', 'Chef', 'Waiter', 'Manager', 'Chef', 'Waiter'];
+
+const staffUnique = [...new Set(staff)];   // ['Waiter', 'Chef', 'Manager']
+```
+
+**Why it matters:** This is the idiomatic one-liner for deduplicating an array. `new Set()` strips the duplicates, the spread turns it back into a real array (so you get `.map()`, `.filter()`, etc. again).
+
+Counting unique values without converting back:
+
+```js
+new Set(staff).size;                        // 3
+new Set('omerfarukbalik').size;             // number of distinct letters
+```
+
+### Set Operations (ES2024)
+
+Four methods for comparing two sets. **None of them mutate** — each returns a **new** Set.
+
+```js
+const italianFoods = new Set(['pasta', 'gnocchi', 'tomatoes', 'garlic']);
+const mexicanFoods = new Set(['tortillas', 'beans', 'rice', 'tomatoes', 'garlic']);
+```
+
+| Method | Returns |
+|---|---|
+| `.intersection(other)` | items in **both** |
+| `.union(other)` | **all** items, duplicates removed |
+| `.difference(other)` | items in the first but **not** the second |
+| `.symmetricDifference(other)` | items in **either but not both** (everything except the overlap) |
+
+```js
+italianFoods.intersection(mexicanFoods);         // Set { 'tomatoes', 'garlic' }
+italianFoods.union(mexicanFoods);                // all, no duplicates
+italianFoods.difference(mexicanFoods);           // Set { 'pasta', 'gnocchi' }
+italianFoods.symmetricDifference(mexicanFoods);  // everything NOT in the overlap
+```
+
+There are also three that return a **boolean**: `.isSubsetOf()`, `.isSupersetOf()`, `.isDisjointFrom()`.
+
+**Support:** These landed as Baseline in June 2024 — all major browsers, and Node.js 22+. Safe to use, but worth knowing they're recent if you're targeting an old environment.
+
+---
+
+## Maps
+
+**In my words:** Like an object — key/value pairs — but the **key can be any data type**. In an object, keys are always strings.
+
+```js
+const rest = new Map();
+
+rest.set('name', 'Classico Italiano');
+rest.set(1, 'Firenze, Italy');       // ← number as a key
+rest.set(2, 'Lisbon, Portugal');
+```
+
+**`.set()` returns the map**, so you can **chain** calls:
+
+```js
+rest
+  .set('categories', ['Italian', 'Pizzeria'])
+  .set('open', 11)
+  .set('close', 23)
+  .set(true, 'We are open')          // ← boolean as a key
+  .set(false, 'We are closed');
+```
+
+### Map Methods
+
+| Method | Does |
+|---|---|
+| `.get(key)` | reads the value |
+| `.set(key, value)` | writes; **returns the map** (chainable) |
+| `.has(key)` | `true` / `false` |
+| `.delete(key)` | removes a key |
+| `.size` | number of entries |
+| `.clear()` | removes everything |
+
+```js
+rest.get('name');          // 'Classico Italiano'
+rest.has('categories');    // true
+rest.delete(2);
+rest.size;
+```
+
+### Converting an Object to a Map
+
+`Object.entries()` produces exactly the `[key, value]` array structure `new Map()` wants:
+
+```js
+const hoursMap = new Map(Object.entries(openingHours));
+```
+
+### Looping a Map
+
+Maps are iterable and each entry is already a `[key, value]` pair:
+
+```js
+for (const [key, value] of question) {
+  if (typeof key === 'number') console.log(`Answer ${key}: ${value}`);
+}
+```
+
+### Converting a Map Back to an Array
+
+```js
+console.log([...question]);            // array of [key, value] pairs
+console.log([...question.keys()]);     // just the keys
+console.log([...question.values()]);   // just the values
+```
+
+### Map vs Object — When to Use Which
+
+| Use a **Map** when | Use an **Object** when |
+|---|---|
+| keys aren't strings | you need methods (`this` works on objects, not maps) |
+| you need easy iteration | you're working with JSON |
+| you add/remove keys a lot | you want `obj.property` dot access |
+| you need `.size` | |
+
+---
+
+## Strings
+
+### Reading
+
+```js
+const airline = 'TAP Air Portugal';
+
+airline.length;              // 16
+airline[0];                  // 'T'
+airline.indexOf('r');        // first occurrence
+airline.lastIndexOf('r');    // last occurrence
+airline.slice(4, 7);         // 'Air'  — start inclusive, end exclusive
+```
+
+`.slice(start, end)` extracts a substring. Negative numbers count from the end: `airline.slice(-8)`.
+
+### Why String Methods Work at All
+
+**In my words:** Strings are **primitives** — they have no methods. When you call a method on a string, JS temporarily converts it to a String **object**, runs the method, then converts the result back to a primitive. This is called **boxing**.
+
+**Why it matters:** It explains the next gotcha.
+
+**Gotcha:** **Strings are immutable.** No string method changes the original — they all return a **new** string. If you don't assign the result, nothing happens.
+
+```js
+let str = '  hello  ';
+str.trim();              // ❌ result thrown away, str unchanged
+str = str.trim();        // ✅
+```
+
+### Common Methods
+
+| Method | Does |
+|---|---|
+| `.toUpperCase()` / `.toLowerCase()` | change case |
+| `.trim()` | remove leading/trailing whitespace |
+| `.replace('old', 'new')` | replace the **first** occurrence |
+| `.replaceAll('old', 'new')` | replace **all** occurrences |
+| `.includes('x')` | → boolean |
+| `.startsWith('x')` / `.endsWith('x')` | → boolean |
+| `.split(' ')` | string → array |
+| `.join('-')` | array → string |
+| `.padStart(n, '*')` / `.padEnd(n, '*')` | pad to a target length |
+| `.repeat(n)` | repeat the string n times |
+
+**Gotcha:** `.replace()` only replaces the **first** match. To replace all, either use `.replaceAll()` or a regex with the global flag — both give the same result:
+
+```js
+str.replaceAll('remove', 'add');
+str.replace(/remove/g, 'add');     // same outcome
+```
+
+### Chaining
+
+Since every method returns a new string, you can chain them:
+
+```js
+const fixed = '  Ömer FARUK  '.trim().toLowerCase();
+```
