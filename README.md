@@ -32,7 +32,7 @@ One folder per section. Notes, challenge solutions, and any course project live 
 - [x] Section 7 — JavaScript in the Browser: DOM and Events
 - [x] Section 8 — How JavaScript Works Behind the Scenes
 - [x] Section 9 — Data Structures, Modern Operators and Strings
-- [ ] Section 10 — A Closer Look at Functions
+- [x] Section 10 — A Closer Look at Functions
 - [ ] Section 11 — Working With Arrays
 - [ ] Section 12 — Numbers, Dates, Intl and Timers
 - [ ] Section 13 — Advanced DOM and Events
