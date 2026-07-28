@@ -1,6 +1,6 @@
 # Section 11 — Working With Arrays
 
-**The most important section for real frontend work.** `map`, `filter`, and `reduce` are what you'll actually reach for every day — in React, in data transformation, everywhere. This is the section to know cold.
+*The most important section for real frontend work.** `map`, `filter`, and `reduce` are what you'll actually reach for every day — in React, in data transformation, everywhere. This is the section to know cold.
 
 ---
 
