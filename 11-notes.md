@@ -1,6 +1,6 @@
 # Section 11 — Working With Arrays
 
-*The most important section for real frontend work.** `map`, `filter`, and `reduce` are what you'll actually reach for every day — in React, in data transformation, everywhere. This is the section to know cold.
+**The most important section for real frontend work.** `map`, `filter`, and `reduce` are what you'll actually reach for every day — in React, in data transformation, everywhere. This is the section to know cold.
 
 ---
 
@@ -361,9 +361,87 @@ arr.fill(9, 2, 4);    // fills 9 from index 2 to 4 (excl)
 
 ---
 
+## Grouping — `Object.groupBy` (ES2024)
+
+**In my words:** Groups the elements of an array into an object, using the **string** a callback returns as the group name. Each group is an array of the elements that produced that name.
+
+```js
+const dogs = [
+  { weight: 22, curFood: 250 },
+  { weight: 8, curFood: 200 },
+  { weight: 32, curFood: 340 },
+];
+
+const grouped = Object.groupBy(dogs, dog =>
+  dog.weight >= 20 ? 'large' : 'small'
+);
+// { small: [ {8...} ], large: [ {22...}, {32...} ] }
+```
+
+**Why it matters:** Before this, grouping meant a `reduce` with manual "does this key exist yet? if not, make an empty array" boilerplate. `Object.groupBy` replaces all of it with one line.
+
+**Gotchas:**
+- The group name is **always coerced to a string**. Grouping by a number or object turns the key into a string — `5` becomes `'5'`. If you need real (non-string) keys, use `Map.groupBy` instead, which returns a Map.
+- **Recent:** Baseline since March 2024 (all modern browsers, Node 21+). In some older browsers it briefly existed as `Array.prototype.group()` before being moved to a static method. Fine to use today, worth a polyfill for old targets.
+
+A common pattern is to return a descriptive key so the group names read well:
+
+```js
+const byOwnerCount = Object.groupBy(dogs, dog => `${dog.owners.length}-owners`);
+// { '1-owners': [...], '2-owners': [...], '3-owners': [...] }
+```
+
+---
+
+## Which Array Method to Use? (decision guide)
+
+The single most useful reference in this section. Pick by **what you want back**.
+
+**To MUTATE the original** (usually avoid these):
+- add: `push` (end), `unshift` (start)
+- remove: `pop` (end), `shift` (start), `splice` (any)
+- other: `reverse`, `sort`, `fill`
+
+**A NEW array based on the original** (safe):
+- same length, transformed: `map`
+- filtered by a condition: `filter`
+- a portion of it: `slice`
+- one element replaced: `with`
+- flattened: `flat`, `flatMap`
+- reversed / sorted / spliced without mutating: `toReversed`, `toSorted`, `toSpliced`
+- joining two arrays: `concat`
+
+**An array INDEX:**
+- by value: `indexOf`
+- by a test condition: `findIndex`, `findLastIndex`
+
+**An array ELEMENT:**
+- by a test condition: `find`, `findLast`
+- by position: `at`
+
+**Know if the array INCLUDES something:**
+- by value: `includes`
+- by a test condition: `some`, `every`
+
+**A new STRING:** `join` (by separator)
+
+**To a single VALUE** (number, string, boolean, or even a new array/object): `reduce`
+
+**To just LOOP** with no new array: `forEach`
+
+**More tools:**
+- group by category → `Object.groupBy`
+- new array from scratch → `Array.from`
+- new array with n empty slots (pair with `fill`) → `new Array(n)`
+- join arrays → `[...arr1, ...arr2]`
+- unique values → `[...new Set(arr)]`
+- values in both arrays → `[...new Set(arr1).intersection(new Set(arr2))]`
+
+---
+
 ## Worked Examples
 
-Two challenges from this section. Standalone files are alongside this note (`challenge-01-check-dogs.js`, `challenge-02-avg-human-age.js`); embedded here for quick reference.
+Four challenges from this section. Two have standalone files alongside this note (`challenge-01-check-dogs.js`, `challenge-02-avg-human-age.js`); all are embedded here for quick reference.
 
 ### Challenge 1 — Adult vs Puppy
 
@@ -406,3 +484,50 @@ console.log(calcAverageHumanAge([16, 6, 10, 5, 6, 1, 4]));
 ```
 
 **The point:** the average is computed *inside* reduce — `acc + value/arr.length` — instead of summing then dividing separately. `arr.length` here is the length **after** filtering, since `arr` is the array reduce receives. This is the chaining pattern you'll use constantly.
+
+### Challenge 4 — Dog Breeds (find, flatMap, Set, some/every, Math.max)
+
+Grab-bag of the whole section on an array of breed objects.
+
+```js
+// the only breed that likes BOTH running and fetch
+const dogBothActivities = breeds.find(
+  dog => dog.activities.includes('running') && dog.activities.includes('fetch')
+).breed;
+
+// unique list of every activity across all breeds
+const uniqueActivities = [...new Set(breeds.flatMap(dog => dog.activities))];
+
+// heaviest weight among breeds that fetch
+const maxFetcher = Math.max(
+  ...breeds.filter(dog => dog.activities.includes('fetch')).map(dog => dog.averageWeight)
+);
+```
+
+**The point:** `flatMap` collapses the per-dog activity arrays into one flat list, then `new Set` dedupes it. For the bonus, `filter → map → Math.max(...)` — the spread turns the array into the individual arguments `Math.max` needs.
+
+**Note:** task 1 (a Husky's weight) is a single lookup — `breeds.find(d => d.breed === 'Husky').averageWeight` — not a `reduce`. Use `find` when you expect one result.
+
+### Challenge 5 — Food Portions (forEach mutation, groupBy, toSorted)
+
+The one that ties Section 11 together — including in-place mutation and grouping.
+
+```js
+// 1. add a property to each object WITHOUT building a new array
+dogs.forEach(dog => (dog.recFood = Math.floor(dog.weight ** 0.75 * 28)));
+//                                              ↑ power, not times
+
+// 8. group by portion in one line
+const byPortion = Object.groupBy(dogs, dog =>
+  dog.curFood > dog.recFood ? 'too-much'
+  : dog.curFood < dog.recFood ? 'too-little'
+  : 'exact'
+);
+
+// 10. sort by recFood ascending WITHOUT mutating
+const dogsSorted = dogs.toSorted((a, b) => a.recFood - b.recFood);
+```
+
+**The point:** task 1 is the rare case where you *want* to mutate — the brief says do NOT create a new array, so `forEach` writes `recFood` straight onto each object. Contrast task 10, which explicitly says don't mutate → `toSorted`, not `sort`. Knowing *when* each is appropriate is the actual lesson.
+
+**Formula gotcha:** `recFood` is `weight ** 0.75 * 28` — weight raised to the 0.75 power. Writing `weight * 0.75` (multiply) gives wrong numbers and throws off every status, group, and sort downstream.
