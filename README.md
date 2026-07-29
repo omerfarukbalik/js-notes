@@ -34,7 +34,7 @@ One folder per section. Notes, challenge solutions, and any course project live 
 - [x] Section 9 — Data Structures, Modern Operators and Strings
 - [x] Section 10 — A Closer Look at Functions
 - [x] Section 11 — Working With Arrays
-- [ ] Section 12 — Numbers, Dates, Intl and Timers
+- [x] Section 12 — Numbers, Dates, Intl and Timers
 - [ ] Section 13 — Advanced DOM and Events
 - [ ] Section 14 — Object-Oriented Programming (OOP)
 - [ ] Section 15 — Mapty App: OOP, Geolocation, External Libraries
