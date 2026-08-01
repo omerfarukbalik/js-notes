@@ -377,3 +377,57 @@ window.addEventListener('load', function (e) { ... });
 // fires just before the user leaves — use sparingly (confirmation dialogs)
 window.addEventListener('beforeunload', function (e) { ... });
 ```
+
+---
+
+## How Scripts Are Loaded — regular vs `async` vs `defer`
+
+Where and how you load your `<script>` changes when the browser fetches and runs it relative to parsing the HTML. Three strategies:
+
+### Regular (no attribute)
+
+```html
+<script src="script.js"></script>
+```
+
+**In my words:** HTML parsing **stops** when it hits the script, waits for it to fetch and execute, then resumes. If placed in `<head>`, the page is blocked while the script downloads — bad. The old fix was to put it at the **end of `<body>`**, so the HTML is already parsed by the time the script runs.
+
+- In `<head>`: parsing pauses → fetch → execute → resume. Blocks rendering.
+- End of `<body>`: HTML fully parsed first, then fetch + execute. Better, but fetching only *starts* late.
+
+### `async`
+
+```html
+<script async src="script.js"></script>
+```
+
+- Script is **fetched asynchronously** (in parallel with HTML parsing) and **executed immediately** when it arrives — parsing **pauses** during execution.
+- **Scripts are NOT guaranteed to run in order** — whichever downloads first runs first.
+- `DOMContentLoaded` does **not** wait for async scripts.
+
+**Use for:** independent third-party scripts where order doesn't matter (analytics, ads).
+
+### `defer`
+
+```html
+<script defer src="script.js"></script>
+```
+
+- Fetched asynchronously (parallel with parsing), but **execution waits until the HTML is completely parsed**.
+- Scripts **execute in order**.
+- `DOMContentLoaded` fires **after** defer scripts finish.
+
+**In my words:** `defer` is the best of both — download happens in parallel so nothing blocks, but the script doesn't run until the DOM is fully built and runs in the order you wrote. **`defer` is the overall best solution** — use it for your own scripts and whenever order matters (like including a library before code that uses it).
+
+### Summary
+
+```
+Load-time ranking:  regular(head) worst  <  regular(body-end)  <  async ≈ defer  best
+```
+
+| | fetch | execute | order kept? | DOMContentLoaded waits? |
+|---|---|---|---|---|
+| regular (head) | blocks | blocks | yes | yes |
+| regular (body end) | late | after parse | yes | yes |
+| `async` | parallel | on arrival, blocks | **no** | no |
+| `defer` | parallel | after parse | **yes** | yes |
