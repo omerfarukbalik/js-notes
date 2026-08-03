@@ -37,7 +37,7 @@ One folder per section. Notes, challenge solutions, and any course project live 
 - [x] Section 12 — Numbers, Dates, Intl and Timers
 - [x] Section 13 — Advanced DOM and Events
 - [x] Section 14 — Object-Oriented Programming (OOP)
-- [ ] Section 15 — Mapty App: OOP, Geolocation, External Libraries
+- [x] Section 15 — Mapty App: OOP, Geolocation, External Libraries
 - [ ] Section 16 — Asynchronous JavaScript: Promises, Async/Await, AJAX
 - [ ] Section 17 — Modern JavaScript Development
 - [ ] Section 18 — Forkify App: Building a Modern Application
